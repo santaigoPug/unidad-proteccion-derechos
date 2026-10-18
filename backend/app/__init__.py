@@ -1,10 +1,10 @@
 from werkzeug.security import generate_password_hash
 from flask import Flask, jsonify, request, session
-from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash
 
 from config import Config
 from .extensions import get_db_connection
+from .decorators import role_required
 
 
 def create_app():
@@ -136,6 +136,7 @@ def create_app():
          "message": "Sesión cerrada correctamente."}), 200
     
     @app.route("/api/usuarios", methods=["POST"])
+    @role_required("Administrador")
     def crear_usuario():
 
      datos = request.get_json(silent=True) or {}
@@ -244,12 +245,8 @@ def create_app():
     
 
     @app.route("/api/usuarios", methods=["GET"])
+    @role_required("Administrador")
     def listar_usuarios():
-        if "id_user" not in session:
-            return jsonify({"message": "Debes iniciar sesión."}), 401
-
-        if session.get("rol") != "Administrador":
-            return jsonify({"message": "No tienes permisos para consultar usuarios."}), 403
 
         conexion = None
         cursor = None
@@ -285,12 +282,8 @@ def create_app():
                 conexion.close()
 
     @app.route("/api/usuarios/<int:id_user>", methods=["PUT"])
+    @role_required("Administrador")
     def modificar_usuario(id_user):
-        if "id_user" not in session:
-            return jsonify({"message": "Debes iniciar sesión."}), 401
-
-        if session.get("rol") != "Administrador":
-            return jsonify({"message": "No tienes permisos para modificar usuarios."}), 403
 
         datos = request.get_json(silent=True) or {}
         username = datos.get("username")
