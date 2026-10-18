@@ -12,7 +12,7 @@ import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
 import './App.css';
 
-const API_URL = 'http://127.0.0.1:5000';
+const API_URL = '';
 
 function RutasAplicacion() {
   const [usuarioActual, setUsuarioActual] = useState(null);

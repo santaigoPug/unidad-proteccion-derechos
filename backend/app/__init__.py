@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 
 from config import Config
 from .extensions import get_db_connection
-from .decorators import role_required
+from .common.decorators import role_required
 
 
 def create_app():
@@ -19,7 +19,7 @@ def create_app():
             r"/api/*": {
                 "origins": [
                     "http://localhost:5173",
-                    "http://127.0.0.1:5173",
+                    #"http://127.0.0.1:5173",
                 ]
             }
         },

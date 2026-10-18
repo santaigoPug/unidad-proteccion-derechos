@@ -4,7 +4,7 @@ from flask import jsonify, session
 
 
 def login_required(view):
-    """Requiere una sesión autenticada para ejecutar la vista."""
+    """Devuelve 401 si no hay una sesión iniciada."""
     @wraps(view)
     def wrapped(*args, **kwargs):
         if "id_user" not in session:
@@ -14,14 +14,16 @@ def login_required(view):
 
 
 def role_required(rol):
-    """Restringe una vista al rol indicado y exige una sesión válida."""
+    """Devuelve 401 sin sesión y 403 si el rol no coincide."""
     def decorator(view):
         @wraps(view)
         def wrapped(*args, **kwargs):
             if "id_user" not in session:
                 return jsonify({"message": "Debes iniciar sesión."}), 401
             if session.get("rol") != rol:
-                return jsonify({"message": "No tienes permisos para realizar esta acción."}), 403
+                return jsonify({
+                    "message": "No tienes permisos para realizar esta acción."
+                }), 403
             return view(*args, **kwargs)
         return wrapped
     return decorator

@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
 import '../styles/Layout.css';
 
-const API_URL = 'http://127.0.0.1:5000';
+const API_URL = '';
 
 function UsersPage({ usuario, onCerrarSesion }) {
   const [username, setUsername] = useState('');
