@@ -1,0 +1,174 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333333;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.pagina-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f4f1f2;
+}
+
+.tarjeta-login {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px;
+  background: #ffffff;
+  border-top: 5px solid #691c32;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.09);
+}
+
+.escudo {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #691c32;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.etiqueta {
+  margin-bottom: 8px;
+  color: #956d3d;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  color: #691c32;
+  font-size: 25px;
+  text-align: center;
+}
+
+.descripcion {
+  margin: 12px 0 28px;
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.campo {
+  margin-bottom: 18px;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.campo input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  outline-offset: 3px;
+}
+
+.campo input:focus {
+  border-color: #691c32;
+  outline: 2px solid #691c32;
+}
+
+.opcion-contrasena {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.opcion-contrasena input {
+  width: 16px;
+  height: 16px;
+  accent-color: #691c32;
+}
+
+.mensaje-error {
+  padding: 10px;
+  background: #fff0f0;
+  color: #a00000;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.boton-principal {
+  width: 100%;
+  padding: 13px;
+  background: #691c32;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.boton-principal:hover {
+  background: #4d1324;
+}
+
+.boton-principal:focus-visible {
+  outline: 3px solid #bc955c;
+  outline-offset: 3px;
+}
+
+.pie-login {
+  margin: 24px 0 0;
+  color: #777777;
+  font-size: 12px;
+  text-align: center;
+}
+
+.bienvenida h2 {
+  margin: 22px 0 12px;
+  color: #691c32;
+  font-size: 18px;
+  text-align: center;
+}
+
+.bienvenida p {
+  text-align: center;
+  line-height: 1.5;
+}
+
+.texto-secundario {
+  color: #777777;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+  .tarjeta-login {
+    padding: 26px 22px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+}
