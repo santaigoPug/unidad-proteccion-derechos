@@ -1,5 +1,5 @@
 
-from app.extensions import get_db_connection
+from backend.app.db import get_db_connection
 import mysql.connector
 
 

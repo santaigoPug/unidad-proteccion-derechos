@@ -1,6 +1,6 @@
 
 from werkzeug.security import generate_password_hash
-from app.extensions import get_db_connection
+from backend.app.db import get_db_connection
 
 
 def restablecer_password():
