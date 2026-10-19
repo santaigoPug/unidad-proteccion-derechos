@@ -3,7 +3,7 @@
 # compartidas de la aplicación cuando sean necesarias.
 
 import mysql.connector
-from backend.app.config import Config
+from app.config import Config
 
 
 def get_db_connection():

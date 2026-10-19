@@ -2,8 +2,8 @@ from werkzeug.security import generate_password_hash
 from flask import Flask, jsonify, request, session
 from werkzeug.security import check_password_hash
 
-from backend.app.config import Config
-from .db import get_db_connection
+from app.config import Config
+from app.db import get_db_connection
 from .common.decorators import role_required
 
 
