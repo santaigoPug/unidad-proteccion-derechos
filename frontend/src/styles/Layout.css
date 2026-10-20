@@ -448,3 +448,118 @@
     width: 100%;
   }
 }
+/* Espaciado entre los paneles de gestión */
+.panel-formulario + .panel-formulario {
+  margin-top: 28px;
+}
+
+.panel-edicion {
+  border-left: 4px solid #691c32;
+}
+
+.panel-lista-usuarios {
+  max-width: 100%;
+}
+
+.barra-lista-usuarios {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: #555;
+  font-size: 14px;
+}
+
+.contenedor-tabla-usuarios {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e8e0e3;
+  border-radius: 8px;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.tabla-usuarios th,
+.tabla-usuarios td {
+  padding: 13px 12px;
+  border-bottom: 1px solid #eee6e9;
+  white-space: nowrap;
+}
+
+.tabla-usuarios th {
+  background: #f7f2f4;
+  color: #691c32;
+  font-weight: bold;
+}
+
+.tabla-usuarios tbody tr:hover {
+  background: #faf7f8;
+}
+
+.tabla-usuarios tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.estado-usuario {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.estado-usuario.activo {
+  background: #eaf6ed;
+  color: #216738;
+}
+
+.estado-usuario.inactivo {
+  background: #fff0f0;
+  color: #a00000;
+}
+
+.boton-editar-usuario {
+  padding: 7px 12px;
+  border: 1px solid #691c32;
+  border-radius: 5px;
+  background: #fff;
+  color: #691c32;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.boton-editar-usuario:hover {
+  background: #691c32;
+  color: #fff;
+}
+
+.estado-lista-usuarios {
+  padding: 22px 0;
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 650px) {
+  .barra-lista-usuarios {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .barra-lista-usuarios button {
+    width: 100%;
+  }
+
+  .tabla-usuarios th,
+  .tabla-usuarios td {
+    padding: 10px 9px;
+  }
+}
