@@ -18,5 +18,6 @@ class Config:
 
     }
     SECRET_KEY = os.getenv("SECRET_KEY")
+    ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")
 
   

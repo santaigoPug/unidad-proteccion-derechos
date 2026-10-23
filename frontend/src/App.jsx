@@ -10,6 +10,7 @@ import {
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
+import PersonasPage from './pages/PersonasPage';
 import './App.css';
 
 const API_URL = '';
@@ -143,8 +144,21 @@ function RutasAplicacion() {
             : <Navigate to="/login" replace />
         }
       />
-
+<Route
+  path="/personas"
+  element={
+    !usuarioActual
+      ? <Navigate to="/login" replace />
+      : (
+        <PersonasPage
+          usuario={usuarioActual}
+          onCerrarSesion={cerrarSesion}
+        />
+      )
+  }
+/>
       <Route
+         
         path="/usuarios"
         element={
           !usuarioActual

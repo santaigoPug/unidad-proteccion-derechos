@@ -5,11 +5,15 @@ from werkzeug.security import check_password_hash
 from app.config import Config
 from app.db import get_db_connection
 from .common.decorators import role_required
+from app.routes.personas_routes import personas_bp
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    from app.routes.municipios_routes import municipios_bp
+
+    app.register_blueprint(municipios_bp, url_prefix="/api")
 
     from flask_cors import CORS
 
@@ -25,6 +29,7 @@ def create_app():
         },
         supports_credentials=True
     )
+    app.register_blueprint(personas_bp)
 
     @app.route("/health", methods=["GET"])
     def health():
