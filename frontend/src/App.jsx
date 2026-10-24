@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
 import PersonasPage from './pages/PersonasPage';
+import ExpedientesPage from './pages/ExpedientesPage';
 import './App.css';
 
 const API_URL = '';
@@ -157,6 +158,19 @@ function RutasAplicacion() {
       )
   }
 />
+<Route
+  path="/expedientes"
+  element={
+    !usuarioActual ? (
+      <Navigate to="/login" replace />
+    ) : (
+      <ExpedientesPage
+        usuario={usuarioActual}
+        onCerrarSesion={cerrarSesion}
+      />
+    )
+  }
+/>
       <Route
          
         path="/usuarios"
@@ -176,6 +190,7 @@ function RutasAplicacion() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    
   );
 }
 

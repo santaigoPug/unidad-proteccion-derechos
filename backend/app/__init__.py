@@ -6,6 +6,7 @@ from app.config import Config
 from app.db import get_db_connection
 from .common.decorators import role_required
 from app.routes.personas_routes import personas_bp
+from app.routes.expedientes_routes import expedientes_bp
 
 
 def create_app():
@@ -30,7 +31,7 @@ def create_app():
         supports_credentials=True
     )
     app.register_blueprint(personas_bp)
-
+    app.register_blueprint(expedientes_bp)
     @app.route("/health", methods=["GET"])
     def health():
         return jsonify({
