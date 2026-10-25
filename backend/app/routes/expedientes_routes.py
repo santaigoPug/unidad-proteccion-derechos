@@ -1,9 +1,11 @@
 
+from re import error
+
 from flask import Blueprint, current_app, jsonify, request
 
 from app.common.decorators import login_required
 from app.services import expedientes_service as service
-
+from app.repositories import expedientes_repository as repository
 
 expedientes_bp = Blueprint("expedientes", __name__)
 
@@ -212,4 +214,85 @@ def obtener_personas_vinculadas(id_expediente):
         )
         return jsonify({
             "message": "No fue posible consultar las personas vinculadas."
+        }), 500
+
+@expedientes_bp.route(
+    "/api/expedientes/<int:id_expediente>/estado",
+    methods=["PATCH"],
+)
+@login_required
+def cambiar_estado_expediente(id_expediente):
+    datos = request.get_json(silent=True)
+
+    if not isinstance(datos, dict):
+        return jsonify({
+            "message": "Debes enviar un objeto JSON válido."
+        }), 400
+
+    estado_nuevo = datos.get("estado")
+    descripcion = datos.get("descripcion")
+
+    try:
+        resultado = service.cambiar_estado_expediente(
+            id_expediente=id_expediente,
+            id_usuario=session_user_id(),
+            estado_nuevo=estado_nuevo,
+            descripcion=descripcion,
+        )
+
+        return jsonify({
+            "message": "Estado actualizado correctamente.",
+            "expediente": resultado,
+        }), 200
+
+    except service.ExpedienteNoEncontrado as error:
+        return jsonify({"message": str(error)}), 404
+
+    except service.ErrorValidacion as error:
+        return jsonify({"message": str(error)}), 400
+
+    except repository.ConflictoEstado as error:
+        return jsonify({"message": str(error)}), 409
+
+    except LookupError as error:
+        return jsonify({"message": str(error)}), 404
+    except Exception:
+        current_app.logger.exception(
+            "Error al cambiar el estado del expediente."
+        )
+        return jsonify({
+            "message": "No fue posible cambiar el estado del expediente."
+        }), 500
+
+
+@expedientes_bp.route(
+    "/api/expedientes/<int:id_expediente>/historial",
+    methods=["GET"],
+)
+@login_required
+def obtener_historial_expediente(id_expediente):
+    try:
+        historial = service.listar_historial_expediente(
+            id_expediente
+        )
+
+        for registro in historial:
+            fecha = registro.get("fecha")
+            if fecha:
+                registro["fecha"] = fecha.isoformat(sep=" ")
+
+        return jsonify({
+            "historial": historial,
+            "total": len(historial),
+        }), 200
+
+    except service.ExpedienteNoEncontrado as error:
+        return jsonify({"message": str(error)}), 404
+
+    except Exception:
+        current_app.logger.exception(
+            "Error al consultar el historial del expediente."
+        )
+        return jsonify({
+            "message": "No fue posible consultar el historial."
         }), 500

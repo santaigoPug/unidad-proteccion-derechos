@@ -1,6 +1,7 @@
 from datetime import datetime
 from app.db import get_db_connection
-
+class ConflictoEstado(Exception):
+    pass
 
 def listar_expedientes():
     conexion = get_db_connection()
@@ -184,5 +185,125 @@ def listar_personas_de_expediente(id_expediente):
 
     finally:
         cursor.close()
+        conexion.close()
+
+def cambiar_estado_expediente(
+    id_expediente,
+    id_usuario,
+    estado_nuevo,
+    descripcion,
+    estado_esperado,
+):
+    conexion = get_db_connection()
+    cursor = None
+
+    try:
+        cursor = conexion.cursor(dictionary=True)
+
+        # Bloquear el expediente para evitar cambios simultáneos.
+        cursor.execute(
+            """
+            SELECT estado
+            FROM expedientes
+            WHERE id_expediente = %s
+            FOR UPDATE
+            """,
+            (id_expediente,),
+        )
+        expediente = cursor.fetchone()
+
+        if not expediente:
+            raise LookupError("El expediente no existe.")
+
+        estado_anterior = expediente["estado"]
+
+        # Verificar que el estado no haya cambiado desde la validación.
+        if estado_anterior != estado_esperado:
+            raise ConflictoEstado(
+                "El estado del expediente cambió. "
+                "Actualiza la información e inténtalo nuevamente."
+            )
+
+        # Registrar el historial.
+        cursor.execute(
+            """
+            INSERT INTO seguimiento (
+                id_expediente,
+                id_usuario,
+                descripcion,
+                estado_anterior,
+                estado_nuevo
+            )
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                id_expediente,
+                id_usuario,
+                descripcion,
+                estado_anterior,
+                estado_nuevo,
+            ),
+        )
+
+        # Actualizar el estado del expediente.
+        cursor.execute(
+            """
+            UPDATE expedientes
+            SET estado = %s
+            WHERE id_expediente = %s
+            """,
+            (estado_nuevo, id_expediente),
+        )
+
+        conexion.commit()
+
+        return {
+            "id_expediente": id_expediente,
+            "estado_anterior": estado_anterior,
+            "estado_nuevo": estado_nuevo,
+        }
+
+    except Exception:
+        conexion.rollback()
+        raise
+
+    finally:
+        if cursor is not None:
+            cursor.close()
+        conexion.close()
+
+
+def listar_historial_expediente(id_expediente):
+    conexion = get_db_connection()
+    cursor = None
+
+    try:
+        cursor = conexion.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT
+                s.id_seguimiento,
+                s.id_expediente,
+                s.fecha,
+                s.descripcion,
+                s.estado_anterior,
+                s.estado_nuevo,
+                s.id_usuario,
+                u.username AS autor
+            FROM seguimiento AS s
+            INNER JOIN usuarios AS u
+                ON u.id_user = s.id_usuario
+            WHERE s.id_expediente = %s
+            ORDER BY s.fecha DESC, s.id_seguimiento DESC
+            """,
+            (id_expediente,),
+        )
+
+        return cursor.fetchall()
+
+    finally:
+        if cursor is not None:
+            cursor.close()
         conexion.close()
 

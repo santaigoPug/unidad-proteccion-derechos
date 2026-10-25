@@ -1,17 +1,54 @@
 from app.repositories import expedientes_repository as repository
 from app.services import personas_service
 from app.services.personas_service import PersonaNoEncontrada  
-ESTADOS_VALIDOS = {
+ESTADOS_VALIDOS = (
     "recibido",
+    "en revisión",
     "en seguimiento",
-    "canalizado",
-    "concluido",
+    "cerrado",
+)
+
+TRANSICIONES_ESTADO = {
+    "recibido": "en revisión",
+    "en revisión": "en seguimiento",
+    "en seguimiento": "cerrado",
+    "cerrado": None,
 }
+
+
 class ErrorValidacion(ValueError):
     pass
+
+
 class ExpedienteNoEncontrado(Exception):
     pass
 
+
+def validar_transicion_estado(estado_actual, estado_nuevo):
+    if estado_actual not in ESTADOS_VALIDOS:
+        raise ErrorValidacion(
+            f"El expediente tiene un estado no reconocido: {estado_actual}."
+        )
+
+    if estado_nuevo not in ESTADOS_VALIDOS:
+        raise ErrorValidacion(
+            f"El estado solicitado no es válido: {estado_nuevo}."
+        )
+
+    siguiente_estado = TRANSICIONES_ESTADO[estado_actual]
+
+    if siguiente_estado is None:
+        raise ErrorValidacion(
+            "El expediente está cerrado y no puede reabrirse."
+        )
+
+    if estado_nuevo != siguiente_estado:
+        raise ErrorValidacion(
+            f"Transición no permitida. Desde '{estado_actual}' "
+            f"solo puedes avanzar a '{siguiente_estado}'."
+        )
+
+    return True
 def _validar_texto(datos, campo, maximo=None):
     valor = datos.get(campo)
 
@@ -107,7 +144,7 @@ def listar_personas_para_expediente(busqueda=""):
             "f_nacimiento": persona["f_nacimiento"],
             "nombre_municipio": municipio,
         })
-
+    return resultado
 
 
 
@@ -214,4 +251,39 @@ def listar_personas_vinculadas(id_expediente):
 
     return personas
 
-    return resultado
+def cambiar_estado_expediente(
+    id_expediente,
+    id_usuario,
+    estado_nuevo,
+    descripcion,
+):
+    if not isinstance(descripcion, str) or not descripcion.strip():
+        raise ErrorValidacion(
+            "La descripción del cambio de estado es obligatoria."
+        )
+
+    if not isinstance(id_usuario, int) or id_usuario <= 0:
+        raise ErrorValidacion(
+            "No se pudo identificar al usuario responsable."
+        )
+
+    expediente = obtener_expediente(id_expediente)
+    estado_actual = expediente["estado"]
+
+    validar_transicion_estado(estado_actual, estado_nuevo)
+
+    return repository.cambiar_estado_expediente(
+        id_expediente=id_expediente,
+        id_usuario=id_usuario,
+        estado_nuevo=estado_nuevo,
+        descripcion=descripcion.strip(),
+        estado_esperado=estado_actual,
+    )
+
+def listar_historial_expediente(id_expediente):
+    expediente = obtener_expediente(id_expediente)
+
+    return repository.listar_historial_expediente(
+        id_expediente
+    )
+
