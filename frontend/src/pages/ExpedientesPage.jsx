@@ -24,6 +24,8 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
   const [expedienteSeleccionado, setExpedienteSeleccionado] = useState('');
   const [personas, setPersonas] = useState([]);
   const [personasVinculadas, setPersonasVinculadas] = useState([]);
+  const [historial, setHistorial] = useState([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [personaSeleccionada, setPersonaSeleccionada] = useState('');
   const [rol, setRol] = useState('Solicitante');
@@ -33,6 +35,9 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
   const [cargandoVinculadas, setCargandoVinculadas] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
+  const [motivoAtencion, setMotivoAtencion] = useState('');
+  const [descripcionExpediente, setDescripcionExpediente] = useState('');
+  const [registrandoExpediente, setRegistrandoExpediente] = useState(false);
 
   const cargarExpedientes = useCallback(async () => {
     setCargandoExpedientes(true);
@@ -87,6 +92,30 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
     }
   }, []);
 
+  const cargarHistorial = useCallback(async (idExpediente) => {
+    if (!idExpediente) {
+      setHistorial([]);
+      return;
+    }
+
+    setCargandoHistorial(true);
+
+    try {
+      const respuesta = await fetch(
+        `${API_URL}/api/expedientes/${idExpediente}/historial`,
+        { credentials: 'include' }
+      );
+
+      const datos = await leerRespuesta(respuesta);
+      setHistorial(datos.historial || []);
+    } catch (error) {
+      setHistorial([]);
+      setMensaje({ tipo: 'error', texto: error.message });
+    } finally {
+      setCargandoHistorial(false);
+    }
+  }, []);
+
   useEffect(() => {
     cargarExpedientes();
   }, [cargarExpedientes]);
@@ -95,6 +124,9 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
     cargarPersonasVinculadas(expedienteSeleccionado);
     setPersonaSeleccionada('');
   }, [expedienteSeleccionado, cargarPersonasVinculadas]);
+  useEffect(() => {
+  cargarHistorial(expedienteSeleccionado);
+}, [expedienteSeleccionado, cargarHistorial]);
 
   useEffect(() => {
     let activo = true;
@@ -139,6 +171,58 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
       activo = false;
     };
   }, [busqueda]);
+  
+async function registrarExpediente(evento) {
+  evento.preventDefault();
+  setMensaje(null);
+
+  const motivo = motivoAtencion.trim();
+  const descripcion = descripcionExpediente.trim();
+
+  if (!motivo || !descripcion) {
+    setMensaje({
+      tipo: 'error',
+      texto: 'Completa el motivo de atención y la descripción.',
+    });
+    return;
+  }
+
+  setRegistrandoExpediente(true);
+
+  try {
+    const respuesta = await fetch(`${API_URL}/api/expedientes`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        motivo_atencion: motivo,
+        descripcion,
+      }),
+    });
+
+    const datos = await leerRespuesta(respuesta);
+
+    setMotivoAtencion('');
+    setDescripcionExpediente('');
+
+    await cargarExpedientes();
+
+    if (datos.expediente?.id_expediente) {
+      setExpedienteSeleccionado(
+        String(datos.expediente.id_expediente)
+      );
+    }
+
+    setMensaje({
+      tipo: 'exito',
+      texto: datos.message || 'Expediente registrado correctamente.',
+    });
+  } catch (error) {
+    setMensaje({ tipo: 'error', texto: error.message });
+  } finally {
+    setRegistrandoExpediente(false);
+  }
+}
 
   async function vincularPersona(evento) {
     evento.preventDefault();
@@ -222,6 +306,7 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
   );
 
   return (
+    
     <div className="estructura-app">
       <Header usuario={usuario} onCerrarSesion={onCerrarSesion} />
 
@@ -260,6 +345,72 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
               </button>
             </div>
           )}
+
+<section className="panel-formulario">
+  <h2>Registrar nuevo expediente</h2>
+  <p>
+    Completa los datos del caso para generar un nuevo expediente.
+  </p>
+
+  <form onSubmit={registrarExpediente}>
+    <div className="campo-formulario">
+      <label htmlFor="motivo-atencion">
+        Motivo de atención
+      </label>
+      <input
+        id="motivo-atencion"
+        type="text"
+        value={motivoAtencion}
+        onChange={(evento) =>
+          setMotivoAtencion(evento.target.value)
+        }
+        maxLength={255}
+        required
+        placeholder="Escribe el motivo de atención"
+      />
+    </div>
+
+    <div className="campo-formulario">
+      <label htmlFor="descripcion-expediente">
+        Descripción del caso
+      </label>
+      <textarea
+        id="descripcion-expediente"
+        value={descripcionExpediente}
+        onChange={(evento) =>
+          setDescripcionExpediente(evento.target.value)
+        }
+        required
+        rows={4}
+        placeholder="Describe la situación y los detalles relevantes"
+      />
+    </div>
+
+    <div className="acciones-formulario">
+      <button
+        type="submit"
+        className="boton-registrar"
+        disabled={registrandoExpediente}
+      >
+        {registrandoExpediente
+          ? 'Registrando...'
+          : 'Registrar expediente'}
+      </button>
+
+      <button
+        type="button"
+        className="boton-limpiar"
+        onClick={() => {
+          setMotivoAtencion('');
+          setDescripcionExpediente('');
+        }}
+        disabled={registrandoExpediente}
+      >
+        Limpiar
+      </button>
+    </div>
+  </form>
+</section>
 
           <section className="panel-formulario">
             <h2>Expedientes registrados</h2>
@@ -458,6 +609,47 @@ function ExpedientesPage({ usuario, onCerrarSesion }) {
                   </div>
                 )}
               </section>
+              
+<section className="panel-formulario">
+  <h2>Historial de movimientos</h2>
+
+  <p>
+    Expediente: <strong>{expedienteActual.codigo_unico}</strong>
+  </p>
+
+  {cargandoHistorial ? (
+    <p>Cargando historial...</p>
+  ) : historial.length === 0 ? (
+    <p>Este expediente todavía no tiene movimientos registrados.</p>
+  ) : (
+    <div className="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha y hora</th>
+            <th>Autor</th>
+            <th>Estado anterior</th>
+            <th>Estado nuevo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {historial.map((registro) => (
+            <tr key={registro.id_seguimiento}>
+              <td>{registro.fecha || 'No disponible'}</td>
+              <td>{registro.autor || 'No disponible'}</td>
+              <td>{registro.estado_anterior || '—'}</td>
+              <td>{registro.estado_nuevo || '—'}</td>
+              <td>{registro.descripcion || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</section>
+
             </>
           )}
         </main>
