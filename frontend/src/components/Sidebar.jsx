@@ -23,11 +23,6 @@ function Sidebar({ usuario }) {
           Personas
         </NavLink>
 
-        <NavLink to="/reportes" className="enlace-menu">
-          <span>▥</span>
-          Reportes
-        </NavLink>
-
         {esAdministrador && (
           <NavLink to="/usuarios" className="enlace-menu">
             <span>♙</span>

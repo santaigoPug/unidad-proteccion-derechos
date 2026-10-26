@@ -2,7 +2,7 @@
 from re import error
 
 from flask import Blueprint, current_app, jsonify, request
-
+from app.db import get_db_connection
 from app.common.decorators import login_required
 from app.services import expedientes_service as service
 from app.repositories import expedientes_repository as repository
