@@ -1,111 +1,203 @@
+/* =====================================================================
+   BASE GLOBAL · Unidad de Protección de Derechos Vulnerados
+   - Tokens de diseño (paleta guinda / dorado, tomada del sitio DIF).
+   - Reinicio ligero y consistente entre navegadores.
+   - Sin CSS anidado nativo ni propiedades sin respaldo, para que funcione
+     igual en Chrome, Edge, Firefox, Safari (iOS/macOS) y Android WebView.
+   ===================================================================== */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Paleta */
+  --guinda: #691c32;
+  --guinda-oscuro: #4d1324;
+  --guinda-suave: #f4e9ed;
+  --dorado: #bc955c;          /* decorativo (bordes, foco) */
+  --dorado-texto: #8a6232;    /* texto dorado con contraste AA sobre claro */
+  --fondo: #f4f1f2;
+  --superficie: #ffffff;
+  --texto: #333333;
+  --texto-suave: #5f5a5d;
+  --borde: #e8e0e3;
+  --borde-campo: #8f8589;     /* contraste >= 3:1 para controles (WCAG 1.4.11) */
+  --exito-fondo: #eaf6ed;
+  --exito-texto: #216738;
+  --error-fondo: #fff0f0;
+  --error-texto: #a00000;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Tipografía: Montserrat si carga; si no, fuentes del sistema */
+  --fuente: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Medidas */
+  --radio: 10px;
+  --radio-campo: 6px;
+  --sombra: 0 3px 12px rgba(0, 0, 0, 0.06);
+  --alto-toque: 44px;         /* objetivo táctil mínimo recomendado */
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* La app es solo clara: evita que el navegador pinte controles oscuros */
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Reinicio */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  font-family: var(--fuente);
+  font-size: 16px;               /* base legible; evita zoom automático en iOS */
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fondo);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;            /* respaldo: 100vh arriba para navegadores sin dvh */
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
+/* Tipografía base (cada componente puede especializarla) */
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h2,
+h3 {
+  margin-top: 0;
+  line-height: 1.25;
+  color: var(--guinda);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
+  margin-top: 0;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Controles de formulario: heredan fuente y se ven igual en todos los motores */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+button {
+  touch-action: manipulation;    /* quita el retardo de doble toque en móviles */
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* Foco visible y coherente para teclado */
+:focus-visible {
+  outline: 3px solid var(--dorado);
+  outline-offset: 3px;
+}
+
+/* Enlace de salto para lectores de pantalla / teclado (si se agrega en el HTML) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+::selection {
+  background: rgba(188, 149, 92, 0.35);
+  color: var(--guinda-oscuro);
+}
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Modo de alto contraste de Windows: conserva bordes y foco */
+@media (forced-colors: active) {
+  .boton-principal,
+  .boton-registrar,
+  .boton-secundario,
+  .boton-limpiar,
+  .boton-editar-usuario {
+    border: 1px solid ButtonText;
+  }
+}
+
+/* Impresión: solo el contenido */
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .encabezado,
+  .barra-lateral,
+  .pie-pagina button,
+  .acciones-formulario,
+  .acciones-tabla {
+    display: none !important;
+  }
+
+  .contenido-principal {
+    padding: 0 !important;
+  }
+
+  .tabla-contenedor,
+  .contenedor-tabla-usuarios {
+    overflow: visible !important;
+    border: 0 !important;
+  }
+
+  .tabla-contenedor table,
+  .tabla-usuarios {
+    min-width: 0 !important;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
 }
